@@ -70,11 +70,36 @@ class Chatbot:
     #############################################################################
 
 
+    def evaluateSentiment(self, line):
+      posScore = 0
+      negScore = 0
+      lam = 1.0
+      for word in line.split(' '):
+
+        if word in self.sentiment:
+          if(self.sentiment[word] == 'pos'):
+            posScore = posScore + 1
+          if(self.sentiment[word] == 'neg'):
+            negScore = negScore + 1
+      if(negScore == 0):
+        posNegRatio = lam
+      else:
+        posNegRatio = float(posScore) / float(negScore)
+      if(posNegRatio >= lam):
+        return 'pos'
+      else:
+        return 'neg'
+
+
+
+
+
 
 
     def grabAndValidateMovieTitle(self, line):
       titleReg = re.compile('[\"\'](.*?)[\"\']')
       results = re.findall(titleReg, line)
+
 
       if(len(results) > 1):
         return "" #TODO : HANDLE ERROR
@@ -109,6 +134,8 @@ class Chatbot:
         response = 'processed %s in starter mode' % input
 
       title = self.grabAndValidateMovieTitle(input)
+      sentiment = self.evaluateSentiment(input)
+      print(sentiment)
 
 
       if title != "":
@@ -169,7 +196,11 @@ class Chatbot:
     #############################################################################
     # 5. Write a description for your chatbot here!                             #
     #############################################################################
-    def intro(self):
+    def intro(self): #INITIALIZATION
+
+
+
+
       return """
       Your task is to implement the chatbot as detailed in the PA6 instructions.
       Remember: in the starter mode, movie names will come in quotation marks and
