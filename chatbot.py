@@ -7,18 +7,11 @@
 ######################################################################
 import csv
 import math
-
 import numpy as np
-
 import re
-
 from NaiveBayes import NaiveBayes
-
-
 from movielens import ratings
 from random import randint
-
-
 
 class Chatbot:
     """Simple class to implement the chatbot for PA 6."""
