@@ -9,7 +9,6 @@ import csv
 import math
 import numpy as np
 import re
-from NaiveBayes import NaiveBayes
 from movielens import ratings
 from random import randint
 
@@ -23,7 +22,6 @@ class Chatbot:
       self.name = 'moviebot'
       self.is_turbo = is_turbo
       self.read_data()
-      self.classifier = NaiveBayes()
 
     #############################################################################
     # 1. WARM UP REPL
@@ -68,31 +66,25 @@ class Chatbot:
       negScore = 0
       lam = 1.0
       for word in line.split(' '):
-
         if word in self.sentiment:
           if(self.sentiment[word] == 'pos'):
             posScore = posScore + 1
           if(self.sentiment[word] == 'neg'):
             negScore = negScore + 1
+      
       if(negScore == 0):
         posNegRatio = lam
       else:
         posNegRatio = float(posScore) / float(negScore)
+      
       if(posNegRatio >= lam):
         return 'pos'
       else:
         return 'neg'
 
-
-
-
-
-
-
     def grabAndValidateMovieTitle(self, line):
       titleReg = re.compile('[\"\'](.*?)[\"\']')
       results = re.findall(titleReg, line)
-
 
       if(len(results) > 1):
         return "" #TODO : HANDLE ERROR
@@ -100,12 +92,10 @@ class Chatbot:
         return ""
 
       for pair in self.titles:
-        if pair[0] == results[0]:
-          return results[0]
+          if results[0] in pair[0]:
+            return results[0]
       else:
-        return "Couldn't find" #TODO : Handle ERROR
-
-
+        return "couldn't find" #TODO : Handle ERROR
 
     def process(self, input):
       """Takes the input string from the REPL and call delegated functions
@@ -118,9 +108,6 @@ class Chatbot:
       # calling other functions. Although modular code is not graded, it is       #
       # highly recommended                                                        #
       #############################################################################
-
-
-
       if self.is_turbo == True:
         response = 'processed %s in creative mode!!' % input
       else:
@@ -128,8 +115,7 @@ class Chatbot:
 
       title = self.grabAndValidateMovieTitle(input)
       sentiment = self.evaluateSentiment(input)
-      print(sentiment)
-
+      
 
       if title != "":
         response = response + " Also, the movie title is " + title
