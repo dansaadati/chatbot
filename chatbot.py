@@ -11,6 +11,7 @@ import numpy as np
 import re
 from movielens import ratings
 from random import randint
+from deps.PorterStemmer import PorterStemmer
 
 class Chatbot:
     """Simple class to implement the chatbot for PA 6."""
@@ -22,6 +23,7 @@ class Chatbot:
       self.name = 'moviebot'
       self.is_turbo = is_turbo
       self.read_data()
+      self.p = PorterStemmer()
 
     #############################################################################
     # 1. WARM UP REPL
@@ -65,6 +67,14 @@ class Chatbot:
       posScore = 0
       negScore = 0
       lam = 1.0
+
+      # Remove the title from the sentence
+      removed = re.sub(r'[\"\'](.*?)[\"\']', '', line)
+
+      # Lemmetize the sentence
+
+      # Set negation state and calculate score
+
       for word in line.split(' '):
         if word in self.sentiment:
           if(self.sentiment[word] == 'pos'):
@@ -126,6 +136,10 @@ class Chatbot:
     #############################################################################
     # 3. Movie Recommendation helper functions                                  #
     #############################################################################
+
+    # from piazza - "If you're going to use the Porter Stemmer,
+    # we recommend stemming the words in the sentiment lexicon
+    # as well as the words in the input sentence."
 
     def read_data(self):
       """Reads the ratings matrix from file"""
