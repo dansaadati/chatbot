@@ -22,8 +22,12 @@ class Chatbot:
     def __init__(self, is_turbo=False):
       self.name = 'moviebot'
       self.is_turbo = is_turbo
-      self.read_data()
+      self.alphanum = re.compile('[^a-zA-Z0-9]')
       self.p = PorterStemmer()
+      self.read_raw_data()
+      self.read_data()
+
+
 
     #############################################################################
     # 1. WARM UP REPL
@@ -62,6 +66,36 @@ class Chatbot:
     # 2. Modules 2 and 3: extraction and transformation                         #
     #############################################################################
 
+    def read_raw_data(self):
+        print "Stemming Documents..."
+
+        title_pattern = re.compile('(.*) \d+\.txt')
+
+        # make sure we're only getting the files we actually want
+        filename = 'data/sentiment.txt'
+        contents = []
+        f = open(filename)
+        of = open('data/stemmed.txt', 'w')
+        
+        for line in f:
+            # make sure everything is lower case
+            line = line.lower()
+
+            pair = line.split(',')
+            print self.p.stem(pair[0]) 
+
+            # stem words
+            line = self.p.stem(pair[0]) + ',' + pair[1][:-2]
+            print line
+            # add to the document's conents
+            contents.extend(line)
+            if len(line) > 0:
+                of.write("".join(line))
+                of.write('\n')
+        f.close()
+        of.close()
+
+        pass
 
     def evaluateSentiment(self, line):
       posScore = 0
@@ -70,6 +104,9 @@ class Chatbot:
 
       # Remove the title from the sentence
       removed = re.sub(r'[\"\'](.*?)[\"\']', '', line)
+      negation = ['no', 'not', 'none', 'never', 'hardly', 'scarcely',
+       'barely', 'doesn\'t', 'isn\'t', 'wasn\'t', 'shouldn\'t',
+        'couldn\'t', 'won\'t', 'can\'t', 'don\'t']
 
       # Lemmetize the sentence
 
