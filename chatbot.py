@@ -67,8 +67,6 @@ class Chatbot:
     #############################################################################
 
     def read_raw_data(self):
-        print "Stemming Documents..."
-
         title_pattern = re.compile('(.*) \d+\.txt')
 
         # make sure we're only getting the files we actually want
@@ -82,11 +80,10 @@ class Chatbot:
             line = line.lower()
 
             pair = line.split(',')
-            print self.p.stem(pair[0]) 
 
             # stem words
             line = self.p.stem(pair[0]) + ',' + pair[1][:-2]
-            print line
+
             # add to the document's conents
             contents.extend(line)
             if len(line) > 0:
@@ -94,7 +91,6 @@ class Chatbot:
                 of.write('\n')
         f.close()
         of.close()
-
         pass
 
     def evaluateSentiment(self, line):
@@ -103,21 +99,37 @@ class Chatbot:
       lam = 1.0
 
       # Remove the title from the sentence
-      removed = re.sub(r'[\"\'](.*?)[\"\']', '', line)
+      removed = re.sub(r'[\"](.*?)[\"]', '', line)
       negation = ['no', 'not', 'none', 'never', 'hardly', 'scarcely',
+        'n\'t', 'didn\'t',
        'barely', 'doesn\'t', 'isn\'t', 'wasn\'t', 'shouldn\'t',
         'couldn\'t', 'won\'t', 'can\'t', 'don\'t']
+      punctuation = set(',.?!;()')
 
       # Lemmetize the sentence
+      line = self.lemonizeLine(removed)
 
       # Set negation state and calculate score
-
+      negating = False
       for word in line.split(' '):
+        if word in negation:
+          negating = not negating
+
         if word in self.sentiment:
           if(self.sentiment[word] == 'pos'):
-            posScore = posScore + 1
+            if negating:
+              negScore = negScore + 1
+            else:
+              posScore = posScore + 1
           if(self.sentiment[word] == 'neg'):
-            negScore = negScore + 1
+            if negating:
+              posScore = posScore + 1
+            else:
+              negScore = negScore + 1
+
+        # if we see punctuation in the word, reset negation flag
+        if set(word) & punctuation:
+          negating = False
       
       if(negScore == 0):
         posNegRatio = lam
@@ -130,7 +142,7 @@ class Chatbot:
         return 'neg'
 
     def grabAndValidateMovieTitle(self, line):
-      titleReg = re.compile('[\"\'](.*?)[\"\']')
+      titleReg = re.compile('[\"](.*?)[\"]')
       results = re.findall(titleReg, line)
 
       if(len(results) > 1):
@@ -143,6 +155,15 @@ class Chatbot:
             return results[0]
       else:
         return "couldn't find" #TODO : Handle ERROR
+
+    def lemonizeLine(self, input):
+      processInput = []
+      for word in input.split(' '):
+        processInput.append(self.p.stem(word))
+
+
+      return ' '.join(processInput)
+
 
     def process(self, input):
       """Takes the input string from the REPL and call delegated functions
@@ -159,6 +180,8 @@ class Chatbot:
         response = 'processed %s in creative mode!!' % input
       else:
         response = 'processed %s in starter mode' % input
+
+
 
       title = self.grabAndValidateMovieTitle(input)
       sentiment = self.evaluateSentiment(input)
@@ -227,9 +250,6 @@ class Chatbot:
     # 5. Write a description for your chatbot here!                             #
     #############################################################################
     def intro(self): #INITIALIZATION
-
-
-
 
       return """
       Your task is to implement the chatbot as detailed in the PA6 instructions.
