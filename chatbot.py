@@ -26,6 +26,7 @@ class Chatbot:
       self.p = PorterStemmer()
       self.read_raw_data()
       self.read_data()
+      self.binarize()
 
 
 
@@ -154,7 +155,7 @@ class Chatbot:
           if results[0] in pair[0]:
             return results[0]
       else:
-        return "couldn't find" #TODO : Handle ERROR
+        return "couldn't find" # TODO : Handle ERROR
 
     def lemonizeLine(self, input):
       processInput = []
@@ -180,8 +181,6 @@ class Chatbot:
         response = 'processed %s in creative mode!!' % input
       else:
         response = 'processed %s in starter mode' % input
-
-
 
       title = self.grabAndValidateMovieTitle(input)
       sentiment = self.evaluateSentiment(input)
@@ -213,8 +212,20 @@ class Chatbot:
 
     def binarize(self):
       """Modifies the ratings matrix to make all of the ratings binary"""
+      self.binarizedRatings = self.ratings
 
-      pass
+      # traverse through the ratings array
+      # if score = 0, bS = 0
+      # if score >= 3.0, bS = 1; score < 3.0 , bS = -1
+      for rowIndex in xrange(len(self.binarizedRatings)):
+        for colIndex in xrange(len(self.binarizedRatings[rowIndex])):
+          currentValue = self.binarizedRatings[rowIndex][colIndex]
+          if currentValue == 0:
+            continue
+          elif currentValue >= 3:
+            self.binarizedRatings[rowIndex][colIndex] = 1
+          else:
+            self.binarizedRatings[rowIndex][colIndex] = -1
 
 
     def distance(self, u, v):
