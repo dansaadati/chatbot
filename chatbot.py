@@ -216,13 +216,14 @@ class Chatbot:
 
       # traverse through the ratings array
       # if score = 0, bS = 0
-      # if score >= 3.0, bS = 1; score < 3.0 , bS = -1
+      # if score >= 2.5, bS = 1; score < 2.5 , bS = -1
+
       for rowIndex in xrange(len(self.binarizedRatings)):
         for colIndex in xrange(len(self.binarizedRatings[rowIndex])):
           currentValue = self.binarizedRatings[rowIndex][colIndex]
           if currentValue == 0:
             continue
-          elif currentValue >= 3:
+          elif currentValue >= 2.5:
             self.binarizedRatings[rowIndex][colIndex] = 1
           else:
             self.binarizedRatings[rowIndex][colIndex] = -1
@@ -232,8 +233,13 @@ class Chatbot:
       """Calculates a given distance function between vectors u and v"""
       # TODO: Implement the distance function between vectors u and v]
       # Note: you can also think of this as computing a similarity measure
-
-      pass
+      vNorm = np.linalg.norm(v)
+      uNorm = np.linalg.norm(u)
+      uDotV = np.dot(u, v)
+      if uNorm == 0 or vNorm == 0:
+        return uDotV
+      else:
+        return float(uDotV) / float(vNorm * uNorm)
 
 
     def recommend(self, u):
