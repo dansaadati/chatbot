@@ -30,7 +30,7 @@ class Chatbot:
 
       # tuple - movie number + user opinion on it
       self.currentUserRatings = []
-      self.minimumDataPoints = 2
+      self.minimumDataPoints = 5
 
 
 
@@ -269,7 +269,7 @@ class Chatbot:
       estimatedRatings = []
       ## constructs a matrix of all predicted user ratings
       print self.currentUserRatings
-      
+
       for movieIndex, movieRow in enumerate(self.ratings):
         userRating = 0
         # userRating = sum of j in user prefs (s_ij dot r_xj)
@@ -280,7 +280,7 @@ class Chatbot:
             userRating = -float('inf')
             break
 
-          userRating += np.dot(self.distance(self.ratings[movieIndex], self.ratings[userMoviePreferenceIndex]), userRating)
+          userRating += np.dot(self.distance(self.binarizedRatings[movieIndex], self.binarizedRatings[userMoviePreferenceIndex]), userRating)
         estimatedRatings.append(userRating)
       
       maxRated = estimatedRatings.index(max(estimatedRatings))
