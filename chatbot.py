@@ -176,6 +176,8 @@ class Chatbot:
       # calling other functions. Although modular code is not graded, it is       #
       # highly recommended                                                        #
       #############################################################################
+      print(self.ratings)
+
       if self.is_turbo == True:
         response = 'processed %s in creative mode!!' % input
       else:
