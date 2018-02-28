@@ -28,6 +28,9 @@ class Chatbot:
       self.read_data()
       self.binarize()
 
+      # tuple - movie number + user opinion on it
+      self.currentUserRatings = []
+
 
 
     #############################################################################
@@ -151,11 +154,11 @@ class Chatbot:
       if(len(results) == 0):
         return ""
 
-      for pair in self.titles:
+      for index, pair in enumerate(self.titles):
           if results[0] in pair[0]:
-            return results[0]
+            return index, results[0]
       else:
-        return "couldn't find" # TODO : Handle ERROR
+        return -1, "couldn't find" # TODO : Handle ERROR
 
     def lemonizeLine(self, input):
       processInput = []
@@ -182,13 +185,21 @@ class Chatbot:
       else:
         response = 'processed %s in starter mode' % input
 
-      title = self.grabAndValidateMovieTitle(input)
+      titleIndex, title = self.grabAndValidateMovieTitle(input)
+      # TODO - HANDLE ERRORS FOR TITLE RETRIEVAL
+      # ---> User inputs invalid title
+      # ---> User inputs no title
+      # ---> User inputs too many titles
+
+      # IF VALID/NO ERRORS, EVALUATE SENTIMENT
       sentiment = self.evaluateSentiment(input)
-      
+      # ---> User feels positively
+      # ---> User feels negatively
+      # ---> TODO FOR CREATIVE: Maybe have a spectrum of emotion. 
 
-      if title != "":
-        response = response + " Also, the movie title is " + title
-
+      # MAP THE TITLE TO SENTIMENT
+      self.currentUserRatings.append((titleIndex, 1 if sentiment == 'pos' else -1))
+      print self.currentUserRatings  
       return response
 
 
