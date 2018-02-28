@@ -30,6 +30,7 @@ class Chatbot:
 
       # tuple - movie number + user opinion on it
       self.currentUserRatings = []
+      self.minimumDataPoints = 2
 
 
 
@@ -185,6 +186,7 @@ class Chatbot:
       else:
         response = 'processed %s in starter mode' % input
 
+
       titleIndex, title = self.grabAndValidateMovieTitle(input)
       # TODO - HANDLE ERRORS FOR TITLE RETRIEVAL
       # ---> User inputs invalid title
@@ -199,7 +201,12 @@ class Chatbot:
 
       # MAP THE TITLE TO SENTIMENT
       self.currentUserRatings.append((titleIndex, 1 if sentiment == 'pos' else -1))
-      print self.currentUserRatings  
+      
+      if len(self.currentUserRatings) >= self.minimumDataPoints:
+        # at this point, we can append a recommendation to the user
+        response += self.recommend(self.currentUserRatings)
+
+
       return response
 
 
@@ -259,7 +266,19 @@ class Chatbot:
       # TODO: Implement a recommendation function that takes a user vector u
       # and outputs a list of movies recommended by the chatbot
 
-      pass
+      estimatedRatings = []
+
+      ## constructs a matrix of all predicted user ratings
+      for movieIndex, movieRow in enumerate(self.ratings):
+        userRating = 0
+        # userRating = sum of j in user prefs (s_ij dot r_xj)
+        for userMoviePreferenceIndex, userRating in self.currentUserRatings:
+          userRating += np.dot(self.distance(self.ratings[movieIndex], self.ratings[userMoviePreferenceIndex]), userRating)
+        estimatedRatings.append(userRating)
+      
+      maxRated = estimatedRatings.index(max(estimatedRatings))
+
+      return self.titles[maxRated][0]
 
 
     #############################################################################
